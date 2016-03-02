@@ -7,8 +7,15 @@ function handleRequest(request, response) {
     fs.readFile('public/favicon.ico', function(err, data) {
       response.end(data);
     });
+  } else if (path.match('/styles/')) {
+    fs.readFile('public'+path, {encoding: 'utf8'}, function(err, data) {
+      if (err) {
+        response.writeHead(404);
+      }
+      response.end(data);
+    });
   } else {
-    path = !path ? 'index.html' : path.match('.html') ? path : path + '.html';
+    path = path === '/' ? '/index.html' : path.match('.html') ? path : path + '.html';
     fs.readFile('public'+path, {encoding: 'utf8'}, function(err, data) {
       if (err) {
         response.writeHead(404);
