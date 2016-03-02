@@ -5,6 +5,7 @@ function handleRequest(request, response) {
   var path = request.url;
   if (path === '/favicon.ico') {
     fs.readFile('public/favicon.ico', function(err, data) {
+      response.setHeader('Content-Type', 'image/icon')
       response.end(data);
     });
   } else if (path.match('/styles/')) {
@@ -12,6 +13,7 @@ function handleRequest(request, response) {
       if (err) {
         response.writeHead(404);
       }
+      response.setHeader('Content-Type', 'text/css')
       response.end(data);
     });
   } else {
