@@ -1,28 +1,23 @@
 var http = require('http');
-var https = require('https');
-var parseURL = require('url').parse;
-const etsyApiKey = '8csi9011pwlsdabu0jbn96du';
+var fs = require('fs');
 
 function handleRequest(request, response) {
-  request.setEncoding('utf8')
-  request.on('data', console.log.bind(console, 'data'));
-  var term = parseURL(request.url, true).query.searchTerm;
-  https.get({
-    host: 'openapi.etsy.com',
-    path: '/v2/listings/active?keywords=' + term + '&api_key=' + etsyApiKey
-  }, function(estyResponse) {
-    handleEstyData(estyResponse, response);
-  });
+  var path = request.url;
+  if (path === '/favicon.ico') {
+    fs.readFile('public/favicon.ico', function(err, data) {
+      response.end(data);
+    });
+  } else {
+    path = !path ? 'index.html' : path.match('.html') ? path : path + '.html';
+    fs.readFile('public'+path, {encoding: 'utf8'}, function(err, data) {
+      if (err) {
+        response.writeHead(404);
+        response.end('Sorry, could not find that');
+      }
+      response.end(data);
+    });
+  }
 };
-
-function handleEstyData(data, res) {
-  data.setEncoding('utf8');
-  res.writeHead(data.statusCode)
-  data.on('data', function (chunk) {
-    res.write(chunk);
-  });
-  data.on('end', res.end.bind(res));
-}
 
 http.createServer(handleRequest).listen(3000, function() {
   console.log('server listening on port 3000');
